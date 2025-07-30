@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "Générateur d'Excuses IA",
+    "slug": "generateur-dexcuses",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#667eea"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.generateurdexuses.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#667eea"
+      },
+      "package": "com.generateurdexuses.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "enableFullScreenImage_legacy": true,
+          "resizeMode": "contain",
+          "ios": {
+            "backgroundColor": "#fa6010",
+            "image": "./assets/logo.png"
+          },
+          "android": {
+            "backgroundColor": "#fa6010",
+            "image": "./assets/logo.png",
+            "imageWidth": 195
+          }
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "android": {
+            "appId": "ca-app-pub-xxxxxxxxxxxxxxxx~wwwwwwwwww"
+          },
+          "ios": {
+            "appId": "ca-app-pub-xxxxxxxxxxxxxxxx~wwwwwwwwww"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
+  }
+}

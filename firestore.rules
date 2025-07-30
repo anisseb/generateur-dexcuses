@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Règles pour la collection users
+    match /users/{userId} {
+      // Permet à l'utilisateur de lire et écrire ses propres données
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Permet la création d'un nouveau document utilisateur lors de l'inscription
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Permet l'accès aux paramètres utilisateur
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Règles pour la collection excuses (pour les fonctionnalités futures)
+    match /excuses/{excuseId} {
+      // Permet à tous les utilisateurs authentifiés de lire les excuses
+      allow read: if request.auth != null;
+      
+      // Permet à l'utilisateur de créer ses propres excuses
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Permet à l'utilisateur de modifier/supprimer ses propres excuses
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Règles pour la collection premiumPacks (pour les fonctionnalités futures)
+    match /premiumPacks/{packId} {
+      // Permet à tous les utilisateurs authentifiés de lire les packs premium
+      allow read: if request.auth != null;
+    }
+
+    // Règles pour la collection userHistory
+    match /userHistory/{userId} {
+      // Permet à l'utilisateur de lire et écrire son propre historique
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+} 
