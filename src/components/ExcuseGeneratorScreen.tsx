@@ -375,6 +375,7 @@ export const ExcuseGeneratorScreen: React.FC = () => {
                <HistoryScreen onGoBack={() => setShowHistory(false)} />
              )}
               {/* Bandeau publicitaire */}
+              {/*
               <View style={styles.bottomAdContainer}>
                 <BannerAd
                   unitId={AD_UNIT_ID}
@@ -384,9 +385,10 @@ export const ExcuseGeneratorScreen: React.FC = () => {
                   }}
                 />
               </View>
+              */}
            </LinearGradient>
          );
-       };
+};
 
 const styles = StyleSheet.create({
   container: {

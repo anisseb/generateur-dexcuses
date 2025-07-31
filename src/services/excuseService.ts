@@ -1,5 +1,6 @@
 import { Excuse, ExcuseRequest, CredibilityLevel, Tone, ExcuseCategory } from '../types';
 import { mistralExcuseService, MistralExcuseResponse } from './mistralExcuseService';
+import { grokExcuseService } from './grokExcuseService';
 
 // Base d'excuses prédéfinies
 const EXCUSE_TEMPLATES = {
@@ -487,15 +488,49 @@ const EXCUSE_TEMPLATES = {
 
 export const excuseService = {
   async generateExcuse(request: ExcuseRequest): Promise<string> {
-    try {
-      // Essayer d'abord Mistral pour une excuse intelligente
-      const mistralResponse = await mistralExcuseService.generateIntelligentExcuse(request);
-      return mistralResponse.excuse;
-    } catch (error) {
-      console.log('Mistral indisponible, utilisation des excuses prédéfinies');
-      // Fallback vers les excuses prédéfinies
-      return this.generateFallbackExcuse(request);
+    let MistralGo = false;
+    
+    // 1. Essayer Grok en premier si la clé API est disponible
+    if (process.env.EXPO_PUBLIC_GROK_API) {
+      try {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout: Grok ne répond pas')), 8000);
+        });
+        const grokPromise = grokExcuseService.generateIntelligentExcuse(request);
+        const grokResponse = await Promise.race([grokPromise, timeoutPromise]);
+        
+        if (grokResponse.success && grokResponse.excuse) {
+          return grokResponse.excuse;
+        } else {
+          MistralGo = true;
+        }
+      } catch (error) {
+        MistralGo = true;
+      }
+    } else {
+      MistralGo = true;
     }
+    
+    // 2. Essayer Mistral si Grok a échoué ou n'est pas configuré
+    if (MistralGo) {
+      try {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout: Mistral AI ne répond pas')), 8000);
+        });
+        const mistralPromise = mistralExcuseService.generateIntelligentExcuse(request);
+        const mistralResponse = await Promise.race([mistralPromise, timeoutPromise]);
+        
+        if (mistralResponse.excuse) {
+          return mistralResponse.excuse;
+        } else {
+        }
+      } catch (error) {
+        console.log('❌ Erreur avec Mistral:', error);
+      }
+    }
+    
+    // 3. Fallback vers les excuses prédéfinies
+    return this.generateFallbackExcuse(request);
   },
 
   generateFallbackExcuse(request: ExcuseRequest): string {
