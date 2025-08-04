@@ -17,6 +17,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { excuseService } from '../services/excuseService';
 import { historyService } from '../services/historyService';
 import { authService } from '../services/authService';
+import { reportService } from '../services/reportService';
 import { getRandomSubtitle } from '../utils/randomUtils';
 import { ExcuseCategory, CredibilityLevel, Tone } from '../types';
 import { SettingsScreen } from './SettingsScreen';
@@ -197,6 +198,49 @@ export const ExcuseGeneratorScreen: React.FC = () => {
     }
   };
 
+  const reportExcuse = async () => {
+    if (!currentExcuse || !user?.id) {
+      Alert.alert('Erreur', 'Aucune excuse à signaler');
+      return;
+    }
+
+    Alert.alert(
+      '🚩 Signaler cette excuse',
+      'Cette excuse vous semble-t-elle inappropriée ou choquante ?',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel'
+        },
+        {
+          text: 'Signaler',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await reportService.reportExcuse(
+                currentExcuse,
+                user.id,
+                user.email || '',
+                selectedCategory,
+                selectedCredibility,
+                selectedTone
+              );
+              
+              Alert.alert(
+                '✅ Signalement enregistré',
+                'Merci pour votre signalement. Notre équipe va examiner cette excuse.',
+                [{ text: 'OK' }]
+              );
+            } catch (error) {
+              console.error('Erreur lors du signalement:', error);
+              Alert.alert('Erreur', 'Impossible d\'enregistrer le signalement');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   // Utiliser le thème par défaut pendant le chargement pour éviter le flickering
   const gradientColors = (isLoading || !isThemeInitialized) ? ['#667eea', '#764ba2'] as [string, string] : themeColors.background as [string, string];
 
@@ -329,6 +373,9 @@ export const ExcuseGeneratorScreen: React.FC = () => {
                         size={isTablet ? 28 : 24} 
                         color={isCurrentExcuseFavorited ? "#FF6B6B" : "#FF6B6B"} 
                       />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={reportExcuse}>
+                      <Ionicons name="flag-outline" size={isTablet ? 28 : 24} color="#FF5722" />
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.excuseText}>"{currentExcuse}"</Text>

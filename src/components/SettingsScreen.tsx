@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { historyService } from '../services/historyService';
+import { reportService } from '../services/reportService';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ProfileScreen } from './ProfileScreen';
@@ -21,6 +22,7 @@ import { DarkModeScreen } from './DarkModeScreen';
 import { SupportScreen } from './SupportScreen';
 import { InfoScreen } from './InfoScreen';
 import { PremiumScreen } from './PremiumScreen';
+import { ReportsScreen } from './ReportsScreen';
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768; // iPad et tablettes
@@ -42,7 +44,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onGoBack }) => {
     totalShared: number;
     totalDeleted: number;
   } | null>(null);
-  const [currentScreen, setCurrentScreen] = useState<'settings' | 'profile' | 'darkMode' | 'support' | 'info'>('settings');
+  const [currentScreen, setCurrentScreen] = useState<'settings' | 'profile' | 'darkMode' | 'support' | 'info' | 'reports'>('settings');
   const [infoSection, setInfoSection] = useState<'about' | 'legal' | 'privacy' | 'terms'>('about');
   const [showPremium, setShowPremium] = useState(false);
 
@@ -89,6 +91,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onGoBack }) => {
   const handlePremium = () => {
     setShowPremium(true);
   };
+
+
 
   const settingsSections = [
     {
@@ -139,6 +143,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onGoBack }) => {
           subtitle: 'Proposer une fonctionnalité',
           icon: '💡',
           onPress: () => openLink('mailto:suggestions@generateur-dexcuses.com', 'Suggestion')
+        },
+        {
+          title: 'Mes signalements',
+          subtitle: 'Voir mes signalements d\'excuses',
+          icon: '🚩',
+          onPress: () => {
+            if (user?.id) {
+              setCurrentScreen('reports');
+            } else {
+              Alert.alert('Erreur', 'Vous devez être connecté pour voir vos signalements');
+            }
+          }
         }
       ]
     },
@@ -230,6 +246,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onGoBack }) => {
 
   if (currentScreen === 'info') {
     return <InfoScreen onGoBack={handleGoBack} initialSection={infoSection} />;
+  }
+
+  if (currentScreen === 'reports') {
+    return <ReportsScreen onGoBack={handleGoBack} />;
   }
 
   // Utiliser le thème par défaut pendant le chargement pour éviter le flickering

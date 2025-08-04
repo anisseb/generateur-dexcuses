@@ -4,7 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
     name: "Générateur d'Excuses IA",
     slug: "generateur-dexcuses",
-    version: "1.0.0",
+    version: "1.1.0",
     orientation: "portrait",
     icon: "./assets/logo.png",
     userInterfaceStyle: "light",

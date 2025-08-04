@@ -16,6 +16,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { historyService } from '../services/historyService';
 import { authService } from '../services/authService';
+import { reportService } from '../services/reportService';
 import { ExcuseCategory, ExcuseHistoryItem, CredibilityLevel, Tone } from '../types';
 import { Share } from 'react-native';
 
@@ -169,6 +170,46 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ onGoBack }) => {
             } catch (error) {
               console.error('Erreur lors de la suppression:', error);
               Alert.alert('Erreur', 'Impossible de supprimer l\'excuse');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const reportExcuse = async (excuse: string, category: string, credibility: string, tone: string) => {
+    if (!user?.id) return;
+    
+    Alert.alert(
+      '🚩 Signaler cette excuse',
+      'Cette excuse vous semble-t-elle inappropriée ou choquante ?',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel'
+        },
+        {
+          text: 'Signaler',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await reportService.reportExcuse(
+                excuse,
+                user.id,
+                user.email || '',
+                category,
+                credibility,
+                tone
+              );
+              
+              Alert.alert(
+                '✅ Signalement enregistré',
+                'Merci pour votre signalement. Notre équipe va examiner cette excuse.',
+                [{ text: 'OK' }]
+              );
+            } catch (error) {
+              console.error('Erreur lors du signalement:', error);
+              Alert.alert('Erreur', 'Impossible d\'enregistrer le signalement');
             }
           }
         }
@@ -370,6 +411,12 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ onGoBack }) => {
                         size={isTablet ? 26 : 20}
                         color={favorites.includes(item.id) ? "#FF6B6B" : "white"}
                       />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => reportExcuse(item.excuse, item.filters.category, item.filters.credibility, item.filters.tone)}
+                    >
+                      <Ionicons name="flag-outline" size={isTablet ? 26 : 20} color="#FF5722" />
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.actionButton, styles.deleteButton]}
